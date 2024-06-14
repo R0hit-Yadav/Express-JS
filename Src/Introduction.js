@@ -171,6 +171,25 @@ app.get("/sortenames",(req,res)=>{
 
 //EX
 /*Create one.html file and app.js */
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//     <title>Document</title>
+// </head>
+// <body>
+//     <form method="get">
+//         <fieldset>
+//             <legend>Sign-Up</legend>
+//             Username:<input type="text" name="uname"></br></br>
+//             Password:<input type="password" name="pass"></br></br>
+//             <input type="submit">
+//         </fieldset>
+//     </form>
+// </body>
+// </html>
+
 const expr=require("express")
 const path=require("path")
 const app=expr()
@@ -183,4 +202,13 @@ app.get("/",(req,res)=>
 })
 app.listen(5000)
 
+/*HTTP Methods */
+
+/*
+index.html
+<html>
+<body>
+<form action="/process_get" method='GET'>
+First
+ */
 
