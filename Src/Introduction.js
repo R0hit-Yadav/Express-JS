@@ -167,4 +167,10 @@ app.get("/sortenames",(req,res)=>{
             res.send()       
 });app.listen(5200)
 
+//==>Serving Staic Files(HTML,CSS,JS,IMAGE FILES)
+
+//EX
+/*Create one.html file and app.js */
+
+
 
