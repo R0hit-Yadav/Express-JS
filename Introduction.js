@@ -127,4 +127,44 @@ app.get("/student",(req,res)=>
         res.send()
 }).listen(5000)
 
+//EX 
+/*Write an express js script to define one JSON array of 3 object having proper-ties
+name and age.short these objects according to age.if user request sort-ednames in url
+then all names along with age should be printed according to 
+desending order of age also display these sorted values on "Sort Page" and display
+Json object on "Home Page"
+*/
+const exper= require("express")
+const app = expr()
+student=[{name:'abc',age:28},
+    {name:"def",age:40},
+    {name:"xyz",age:10}
+]
+app.get("/",(req,res)=>{
+    res.set("content-type","text/html")
+    res.send(student)
+})
+app.get("/sortenames",(req,res)=>{
+    res.set("content-type","text/html")
+    for(i=0;i<student.length;i++)
+        {
+            for(j=0;j<student.length;j++)
+                {
+                    if(student[i].age>student[j].age)
+                        {
+                            temp=student[i];
+                            student[i]=student[j]
+                            student[j]=temp
+                        }
+                }
+
+        }
+        for(k=0;k<student;k++)
+            {
+                res.write("<center><h2>"+student[k].name+""+student[k].age+"</h2></center>")
+
+            }
+            res.send()       
+});app.listen(5200)
+
 
