@@ -171,6 +171,16 @@ app.get("/sortenames",(req,res)=>{
 
 //EX
 /*Create one.html file and app.js */
-
+const expr=require("express")
+const path=require("path")
+const app=expr()
+const staticPath=path.join(__dirname)
+console.log(staticPath)
+app.use(expr.static(staticPath))
+app.get("/",(req,res)=>
+{
+    res.sendFile("/One.html")
+})
+app.listen(5000)
 
 
