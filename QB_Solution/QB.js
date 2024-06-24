@@ -1535,21 +1535,375 @@ app.listen(4000)
 
 
 //QB-282
+//Write a code to upload file and access uploaded file in express js.
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+const storag = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); 
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // File name
+    }
+});
+
+// Initialize multer upload
+const uploa = multer({ storage: storag });
+
+// Endpoint to upload a single file
+app.post('/upload', uploa.single('file'), (req, res) => 
+    {
+    res.send('File uploaded successfully');
+});
+
+app.get('/uploads/:filename', (req, res) => 
+    {
+    const fileName = req.params.filename;
+    res.sendFile(path.join(__dirname, 'uploads', fileName));
+});
+app.listen(4000)
+
 
 
 //QB-283
+// Write express js script to load student form using pug file which contains following fields Name(text) Email(email) Course(radio : CE, IT, CSE) 
+// Once form submitted then data must be displayed on ‘/data’ page using pug file. Means data should be submitted from express application to PUG file
+
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.set('views', path.join(__dirname, 'views'));
+
+app.set('view engine', 'pug');
+
+app.get('/', (req, res) => 
+    {
+    res.render('studentForm');
+});
+
+app.post('/data', (req, res) => 
+    {
+    const { name, email, course } = req.body;
+    res.render('data', { name, email, course });
+});
+
+app.listen(4000)
+
+// .pug 
+// doctype html
+// html
+//     head
+//         title Student Form
+//     body
+//         h1 Student Form
+//         form(action='/data', method='post')
+//             label(for='name') Name:
+//             input(type='text', id='name', name='name')
+
+//             br
+
+//             label(for='email') Email:
+//             input(type='email', id='email', name='email')
+
+//             br
+
+//             label Course:
+//             br
+//             input(type='radio', id='ce', name='course', value='CE')
+//             label(for='ce') CE
+//             br
+//             input(type='radio', id='it', name='course', value='IT')
+//             label(for='it') IT
+//             br
+//             input(type='radio', id='cse', name='course', value='CSE')
+//             label(for='cse') CSE
+
+//             br
+
+//             button(type='submit') Submit
+
+//view.pug
+// doctype html
+// html
+//     head
+//         title Student Data
+//     body
+//         h1 Student Data
+//         ul
+//             li Name: #{name}
+//             li Email: #{email}
+//             li Course: #{course}
+
+
 
 
 //QB-284
+// Write an express js script that allows only image type file to be uploaded using the multer middleware and saves the file to the specific directory called 
+// “IMAGES”. If file other than image has been uploaded then it will give an error message that “Upload only image file”.
+
+//html
+// <!-- index.html -->
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//     <title>Image Upload</title>
+// </head>
+// <body>
+//     <h1>Image Upload</h1>
+//     <form action="http://localhost:3000/upload" method="POST" enctype="multipart/form-data">
+//         <input type="file" name="image">
+//         <button type="submit">Upload</button>
+//     </form>
+// </body>
+// </html>
+
+
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+
+// Multer storage configuration
+const storagea = multer.diskStorage({
+    destination: function (req, file, cb) 
+    {
+        cb(null, 'IMAGES/'); 
+    },
+    filename: function (req, file, cb) 
+    {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => 
+    {
+    if (file.mimetype.startsWith('image')) 
+    {
+        cb(null, true);
+    } 
+    else 
+    {
+        cb(new Error('Upload only image file'), false);
+    }
+};
+
+const uploada = multer({ 
+    storage: storagea,
+    fileFilter: fileFilter
+});
+
+app.post('/upload', uploada.single('image'), (req, res, next) => 
+    {
+    if (!req.file) 
+    {
+        return res.status(400).send('No file uploaded');
+    }
+    res.send('File uploaded successfully');
+});
+
+app.use((err, req, res, next) => 
+    {
+    if (err instanceof multer.MulterError) 
+    {
+        res.status(400).send('Error uploading file: ' + err.message);
+    } 
+    else 
+    {
+        res.status(500).send('Server error: ' + err.message);
+    }
+});
+app.listen(3000)
+
 
 
 //QB-285
+// Write an express JS script to upload any type of file of size up to 50KB only.
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+const storageb = multer.diskStorage({
+    destination: function (req, file, cb) 
+    {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) 
+    {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const fileSizeLimit = 50 * 1024; // 50 KB
+
+const uploadb = multer({
+    storage: storageb,
+    limits: 
+    { 
+        fileSize: fileSizeLimit 
+    },
+    fileFilter: function (req, file, cb) 
+    {
+        
+        cb(null, true);
+    }
+});
+
+app.post('/upload', uploadb.single('file'), (req, res) => 
+    {
+    if (!req.file) 
+        {
+        return res.status(400).send('No file uploaded');
+    }
+    res.send('File uploaded successfully');
+});
+
+app.use((err, req, res, next) => 
+    {
+    if (err instanceof multer.MulterError) 
+        {
+        res.status(400).send('Error uploading file: ' + err.message);
+    } 
+    else 
+    {
+        res.status(500).send('Server error: ' + err.message);
+    }
+});
+
+app.listen(3000)
+
 
 
 //QB-286
+// write a code to create a link named “About Us”  using a Pug template engine inside Express code.when you click on 
+// “About Us” it  will redirect to the next page  “/about” and display the message “welcome to About us  page”.
+
+//.pug
+// doctype html
+// html
+//     head
+//         title Home Page
+//     body
+//         h1 Welcome to Home Page
+//         a(href='/about') About Us
+
+//view.pug
+// doctype html
+// html
+//     head
+//         title About Us Page
+//     body
+//         h1 Welcome to About Us Page
+
+const express = require('express');
+const path = require('path');
+
+
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+app.get('/', (req, res) => 
+    {
+    res.render('index');
+});
+
+app.get('/about', (req, res) => 
+    {
+    res.render('about');
+});
+
+app.listen(3000)
+
+
 
 
 //QB-287
+// Perform the following tasks as asked:
+// 1) Create a HTML file for response form and this file should be loaded on home(‘/’) page. •Fields are : Name, Email and Submit button.
+// 2) Once Response is submitted, message “Thank you for your response.” Will be displayed on page ‘/response’ and 
+// also send mail to the entered email id with the submitted response.
+
+//html
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//     <title>Response Form</title>
+// </head>
+// <body>
+//     <h1>Response Form</h1>
+//     <form action="/response" method="POST">
+//         <label for="name">Name:</label>
+//         <input type="text" id="name" name="name" required><br><br>
+        
+//         <label for="email">Email:</label>
+//         <input type="email" id="email" name="email" required><br><br>
+        
+//         <button type="submit">Submit</button>
+//     </form>
+// </body>
+// </html>
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const path = require('path');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => 
+    {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+app.post('/response', (req, res) => 
+    {
+    const { name, email } = req.body;
+    sendEmail(email);
+    res.send('Thank you for your response.');
+});
+function sendEmail(email) 
+{
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'your_email@gmail.com', // Replace with your email address
+            pass: 'your_password' // Replace with your email password
+        }
+    });
+    let mailOptions = 
+    {
+        from: 'your_email@gmail.com',
+        to: email,
+        subject: 'Thank you for your response',
+        text: 'Thank you for submitting your response.'
+    };
+    transporter.sendMail(mailOptions, (error, info) => 
+        {
+        if (error) 
+            {
+            console.log('Error occurred while sending email:', error.message);
+        } 
+        else 
+        {
+            console.log('Email sent:', info.response);
+        }
+    });
+}
+app.listen(3000)
+
+
 
 
 //QB-288
