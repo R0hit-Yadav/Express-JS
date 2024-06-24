@@ -1096,3 +1096,201 @@ app.get('/result', (req, res) =>
 
 //QB-241 how to send HTML and JSON data as a Response using Express js.
 // as shown above
+
+
+
+
+
+// ======================================================================================================================= //
+
+//QB-271
+// Write an expressJS code in which RESTapi is created for json object named Places I love which contains name,country,state,city 
+// and rating out of 10(no decimal points) is given.upon passing ratings on the browser it should display the places having that rating.i.e. 
+// on localhost:30001/a/10 should display all the places having 10 ratings.
+const express = require('express');
+
+const places = [
+    {
+      "name": "Golden Gate Bridge",
+      "country": "USA",
+      "state": "California",
+      "city": "San Francisco",
+      "rating": 9
+    },
+    {
+      "name": "Eiffel Tower",
+      "country": "France",
+      "state": "Île-de-France",
+      "city": "Paris",
+      "rating": 10
+    },
+    {
+      "name": "Great Barrier Reef",
+      "country": "Australia",
+      "state": "Queensland",
+      "city": "Cairns",
+      "rating": 10
+    }
+  ]
+
+  app.get('/places', (req, res) => 
+{
+  res.json(places);
+});
+
+app.get('/a/:rating', (req, res) => 
+{
+  const rating = parseInt(req.params.rating); 
+  const filteredPlaces = places.filter(place => place.rating === rating);
+  res.json(filteredPlaces);
+});app.listen(5000)
+
+
+
+//QB-272
+// write a code to create a link named “Contact Us” using a Pug template engine inside  Express code. 
+// When you click on “Contact Us” it will redirect to the next page “/contact”  and display the message “welcome to Contact us page”.
+
+//.pug
+// doctype html
+// html
+//   head
+//     title Express Pug Example
+//   body
+//     h1 Welcome to Express with Pug
+//     p Click #{a(href='/contact')} to contact us.
+
+const express = require('express');
+
+app.set('view engine', 'pug');
+app.set('views', './views');
+
+app.get('/', (req, res) => 
+{
+  res.render('index');
+});
+app.get('/contact', (req, res) => 
+{
+  res.render('contact', { message: 'Welcome to Contact Us page' });
+});
+app.listen(5000)
+
+
+
+
+//QB-273 
+//Write an express.js script to send automatic mail to specified user.
+
+const express = require('express');
+const nodemailer = require('nodemailer');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/send-email', async (req, res) => 
+{
+    const { to, subject, text } = req.body;
+    try {
+        let transporter = nodemailer.createTransport(
+            {
+            service: 'gmail',
+            auth: 
+            {
+                user: 'your-email@gmail.com',  // Your email address
+                pass: 'your-password'         // Your email password or app-specific password
+            }
+        });
+
+        let mailOptions = 
+        {
+            from: 'your-email@gmail.com',
+            to: to,
+            subject: subject,
+            text: text
+        };
+
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Email sent:', info.messageId);
+        res.send('Email sent successfully');
+    } 
+    catch (error) 
+    {
+        console.error('Error sending email:', error);
+        res.status(500).send('Error sending email');
+    }
+});
+app.listen(3000)
+
+
+//QB-274
+//Write an express.js script to upload image.
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage(
+    {
+    destination: function(req, file, cb) 
+    {
+        cb(null, './public/uploads/');
+    },
+    filename: function(req, file, cb) 
+    {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+app.use(express.static('public'));
+app.post('/upload', upload.single('image'), (req, res) => 
+    {
+    if (!req.file) 
+    {
+        return res.status(400).send('No files were uploaded.');
+    }
+    res.send(`File uploaded successfully: ${req.file.filename}`);
+});
+app.listen(5000)
+
+
+//QB-275
+
+//QB-276
+
+//QB-277
+
+//QB-278
+
+//QB-279
+
+//QB-280
+
+//QB-281
+
+//QB-282
+
+
+//QB-283
+
+
+//QB-284
+
+
+//QB-285
+
+
+//QB-286
+
+
+//QB-287
+
+
+//QB-288
+
+//QB-289
+
+
+//QB-290
+
+//QB-291
+
+//QB-292
