@@ -864,30 +864,235 @@ app.listen(5200)
 // 3. If one formula is selected and numbers are entered then Both numbers should be stored in cookies which expires in 50 seconds.
 //  Respective calculations will be performed on the page “/calc”.
 
+//index.html
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <title>Calculator</title>
+// </head>
+// <body>
+//     <div class="container">
+//         <h2>Calculator</h2>
+//         <form action="/calc" method="POST">
+//             <label for="num1">Number 1:</label>
+//             <input type="number" id="num1" name="num1" min="1" required><br><br>
+            
+//             <label for="num2">Number 2:</label>
+//             <input type="number" id="num2" name="num2" min="1" required><br><br>
+            
+//             <label for="operation">Operation:</label>
+//             <select id="operation" name="operation" required>
+//                 <option value="">Select Operation</option>
+//                 <option value="addition">Addition</option>
+//                 <option value="subtraction">Subtraction</option>
+//                 <option value="multiplication">Multiplication</option>
+//                 <option value="division">Division</option>
+//             </select><br><br>
+            
+//             <button type="submit">Calculate</button>
+//         </form>
+//     </div>
+// </body>
+// </html>
+
+//app.js
+const express = require('express');
+const path = require('path');
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/calc', (req, res) => 
+{
+    const { num1, num2, operation } = req.body;
+
+    if (num1 <= 0 || num2 <= 0) 
+    {
+        return res.send('Please enter valid numbers (greater than 0).');
+    }
+
+    if (!operation) 
+    {
+        return res.send('Please select an operation.');
+    }
+
+    let result;
+    switch (operation) 
+    {
+        case 'addition':
+            result = parseFloat(num1) + parseFloat(num2);
+            break;
+        case 'subtraction':
+            result = parseFloat(num1) - parseFloat(num2);
+            break;
+        case 'multiplication':
+            result = parseFloat(num1) * parseFloat(num2);
+            break;
+        case 'division':
+            result = parseFloat(num1) / parseFloat(num2);
+            break;
+        default:
+            result = 'Invalid operation selected.';
+    }
+    res.redirect(`/calc?num1=${num1}&num2=${num2}&operation=${operation}&result=${result}`);
+});
+
+app.get('/calc', (req, res) => 
+{
+    const { num1, num2, operation, result } = req.query;
+    res.send(`Result of ${operation} (${num1} and ${num2}): ${result}`);
+});
+app.listen(5000)
+
+
+
 
 
 //QB-233
+// Write an ExpressJS to take a UserName, Password, Textarea for “message” & submit 
+// button using get method.
+// 1) After clicking submit button the content of submitted details should be represented on 
+// “/login” page along with one “show vowel” link. 2) By clicking “show vowel” link count of vowel used in submitted “message” will display on “/message” page. 
+// (Use next() to route page)
+
+const express = require('express');
+const path = require('path');
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'views')));
+
+app.get('/', (req, res) => 
+{
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
+});
+
+app.get('/login', (req, res, next) => 
+{
+    const { username, password, message } = req.query;
+    res.locals.username = username;
+    res.locals.password = password;
+    res.locals.message = message;
+        next();
+}, (req, res) => 
+    {
+    res.render('login.html', 
+        {
+        username: res.locals.username,
+        password: res.locals.password,
+        message: res.locals.message
+    });
+});
+app.get('/message', (req, res, next) => 
+{
+    const { message } = res.locals;
+    const vowelCount = countVowels(message);
+    res.locals.vowelCount = vowelCount;
+    next();
+}, (req, res) => 
+    {
+    res.render('message.html', 
+        {
+        vowelCount: res.locals.vowelCount
+    });
+});
+function countVowels(str) 
+{
+    const vowels = 'aeiouAEIOU';
+    let count = 0;
+    for (let char of str) 
+    {
+        if (vowels.includes(char)) 
+        {
+            count++;
+        }
+    }
+    return count;
+}
+app.listen(5000)
 
 
-//QB-234
+//QB-234 
+//Write an express.js script to print "The Pacific Ocean is the largest and deepest of the world ocean" also run on appropriate localhost.
+const express = require('express');
+app.get('/', (req, res) => 
+{
+    res.send('The Pacific Ocean is the largest and deepest of the world ocean');
+});app.listen(3000)
 
 
 //QB-235
+// Write expressJS script to perform task as asked: 
+// (A) Create one HTML file which contains text-field named username, one dropdown which contains options of country like India, USA, Canada, Australia. 
+// & one submit button. 
+// (B) Once user clicked on submit button it will jump to next page than username & You are from “country name” which ever selected from drop box should be printed.
+// (C) Use get method to request data.
+
+//index.html
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <title>User Information</title>
+// </head>
+// <body>
+//     <div class="container">
+//         <h2>User Information</h2>
+//         <form action="/result" method="GET">
+//             <label for="username">Username:</label>
+//             <input type="text" id="username" name="username" required><br><br>
+            
+//             <label for="country">Country:</label>
+//             <select id="country" name="country" required>
+//                 <option value="">Select Country</option>
+//                 <option value="India">India</option>
+//                 <option value="USA">USA</option>
+//                 <option value="Canada">Canada</option>
+//                 <option value="Australia">Australia</option>
+//             </select><br><br>
+            
+//             <button type="submit">Submit</button>
+//         </form>
+//     </div>
+// </body>
+// </html>
+
+//app.js
+const express = require('express');
+const path = require('path');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/result', (req, res) => 
+{
+    const { username, country } = req.query;
+    res.render('result.html', 
+    {
+        username: username,
+        country: country
+    });
+});app.listen(5000)
 
 
-//QB-236
+
+//QB-236 MIddleWare Defination and Example 
 
 
-//QB-237
+//QB-237 how to link html,css and js file in express js give any short example form it
+// as shown above
 
 
-//QB-238
+//QB-238 write a use of bodyparse.urlencodedmethod in express js
+// as shown above
 
 
-//QB-239
+//QB-239 app.use is overloded method or not jystify that
+// as shown above
 
 
-//QB-240
+//QB-240 give example of cookies. create cookies and delete cookies.
+// as shown above
 
 
-//QB-241
+//QB-241 how to send HTML and JSON data as a Response using Express js.
+// as shown above
