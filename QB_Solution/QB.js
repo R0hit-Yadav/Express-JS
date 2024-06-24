@@ -1302,8 +1302,10 @@ const storage2 = multer.diskStorage(
     {
         cb(null, 'public/uploads/'); 
     },
-    filename: function(req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);  
+    filename: function(req, file, cb) 
+    {
+        cb(null, Date.now() + '-' + file.originalname); 
+    }
 });
 const upload2 = multer({ storage: storage2 });
 app.use(express.static('public'));
@@ -1907,12 +1909,215 @@ app.listen(3000)
 
 
 //QB-288
+// Write a code to set up nodemailer in Express.js. 
+// Sender email id: “lju@gmail.com”. 
+// Receiver email ids: “student@gmail.com and faculty@gmail.com”. Mail subject should be “LJ University” 
+// Mail body contains “Welcome Student” in h3 tag and in table display data Date 28/06/23, Exam name FSD-2.
+const express = require('express');
+const nodemailer = require('nodemailer');
+
+const transporterr = nodemailer.createTransport({
+    service: 'gmail',
+    auth: 
+    {
+        user: 'lju@gmail.com', // Sender email id
+        pass: 'your_password' // Replace with your email password
+    }
+});
+
+app.get('/sendEmail', (req, res) => 
+    {
+    const receivers = ['student@gmail.com', 'faculty@gmail.com'];
+
+    const mailOptions = 
+    {
+        from: 'lju@gmail.com',
+        to: receivers.join(', '), // Join receiver emails with comma
+        subject: 'LJ University',
+        html: `
+            <h3>Welcome Student</h3>
+            <table border="1">
+                <tr><td>Date</td><td>28/06/23</td></tr>
+                <tr><td>Exam name</td><td>FSD-2</td></tr>
+            </table>
+        `
+    };
+
+    
+    transporter.sendMail(mailOptions, (error, info) => 
+        {
+        if (error) 
+            {
+            console.log('Error occurred while sending email:', error.message);
+            res.send('Error occurred while sending email');
+        } else {
+            console.log('Email sent:', info.response);
+            res.send('Email sent successfully');
+        }
+    });
+});
+app.listen(3000)
+
 
 //QB-289
+// Write an express js script to configure the multer middleware. Perform following tasks. 
+// 1) Create a pug file named "file.pug". This file contains heading(h3) "Upload your CV" in red color. And, 
+// a form with input type file(to browse and select file) and submit(to upload the file). 
+// 2) Create a js file named "file.js" and link this js and pug file to browse pug file on "/home" page. 
+// 3) After uploading a file display message on "/upload" page "(file original name) has been uploaded". 
+// 4) Save uploaded files to specific directory named "upload". And in this folder file must be stored in format of "lju-file.pdf" where "lju" is the field name. 
+
+const express = require('express');
+const path = require('path');
+const multer = require('multer');
+
+
+app.set('views', path.join(__dirname, 'public'));
+app.set('view engine', 'pug');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+const storagec = multer.diskStorage({
+    destination: function (req, file, cb) 
+    {
+        cb(null, 'uploads/'); // Directory to save uploaded files
+    },
+    filename: function (req, file, cb) {
+        cb(null, 'lju-' + file.originalname); // File naming format
+    }
+});
+const uploadc = multer({ storage: storagec });
+
+app.get('/home', (req, res) => 
+    {
+    res.render('file');
+});
+
+app.post('/upload', uploadc.single('lju'), (req, res) => 
+    {
+    if (!req.file) 
+        {
+        return res.status(400).send('No files were uploaded.');
+    }
+    res.send(`${req.file.originalname} has been uploaded.`);
+});
+app.listen(3000)
+
+//.pug
+// doctype html
+// html
+//     head
+//         title File Upload
+//         style
+//             h3 {
+//                 color: red;
+//             }
+//     body
+//         h3 Upload your CV
+//         form(action='/upload', method='post', enctype='multipart/form-data')
+//             input(type='file', name='lju')
+//             br
+//             button(type='submit') Upload
+
 
 
 //QB-290
+//Write express js script to upload file with size limit of 1 MB to a specific directory named “Data” on the server.
+
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+
+const storaged = multer.diskStorage({
+    destination: function (req, file, cb) 
+    {
+        cb(null, 'uploads/Data/'); // Directory to save uploaded files
+    },
+    filename: function (req, file, cb) 
+    {
+        cb(null, file.originalname); // Use original filename
+    }
+});
+
+const uploadd = multer({
+    storage: storaged,
+    limits: { fileSize: 1000000 } // 1 MB file size limit
+});
+
+app.post('/upload', uploadd.single('file'), (req, res) => 
+    {
+    if (!req.file) 
+        {
+        return res.status(400).send('No file uploaded.');
+    }
+    res.send('File uploaded successfully.');
+});
+app.listen(3000)
+
 
 //QB-291
+// Write an express js script to configure the multer middleware. Perform following tasks.
+// 1) Create a html form file named "form.html" in public folder. This file contain centrally oriented heading(h3) "Upload your File" in 
+// red color with background-color aqua. Along with choose file option(to browse and select file) and submit button(to upload the file). 
+// (Must use external css having name “effect.css” in public folder)
+// 2) Create a js file to show result after uploading any type of file, message should be displayed on "/upload" page "(file original name) has been uploaded".
+// (Css effect must include while running js code)
+// 3) Save uploaded files to specific directory named "File". And in this folder file must be stored in format of "data-file.pdf" where "data" is the field name
+
+//html
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <title>Upload Form</title>
+//     <link rel="stylesheet" type="text/css" href="effect.css">
+// </head>
+// <body>
+//     <div class="container">
+//         <h3 class="heading">Upload your File</h3>
+//         <form action="/upload" method="post" enctype="multipart/form-data">
+//             <input type="file" name="data">
+//             <br>
+//             <button type="submit">Upload</button>
+//         </form>
+//     </div>
+// </body>
+// </html>
+
+
+const express = require('express');
+const path = require('path');
+const multer = require('multer');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+const storagee = multer.diskStorage({
+    destination: function (req, file, cb) 
+    {
+        cb(null, 'uploads/File/'); 
+    },
+    filename: function (req, file, cb) {
+        cb(null, 'data-' + file.originalname); 
+    }
+});
+
+const uploade= multer({ storage: storagee });
+
+app.get('/home', (req, res) => 
+    {
+    res.sendFile(path.join(__dirname, 'public', 'form.html'));
+});
+
+app.post('/upload', uploade.single('data'), (req, res) => 
+    {
+    if (!req.file) 
+    {
+        return res.status(400).send('No file uploaded.');
+    }
+    res.send(`${req.file.originalname} has been uploaded.`);
+});
+
+app.listen(5000)
 
 //QB-292
