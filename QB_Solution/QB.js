@@ -1253,18 +1253,286 @@ app.listen(5000)
 
 
 //QB-275
+// Write a code snippet to configure the multer middleware to store uploaded files in a specific directory called "uploads"
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+const storage1 = multer.diskStorage({
+    destination: function(req, file, cb) 
+    {
+        cb(null, 'uploads/'); 
+    },
+    filename: function(req, file, cb) 
+    {
+        cb(null, file.originalname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload1 = multer({ storage: storage1 });
+
+app.post('/upload', upload1.single('file'), (req, res) => 
+    {
+    if (!req.file) 
+    {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    res.send(`File uploaded successfully: ${req.file.filename}`);
+});
+app.listen(5000)
+
 
 //QB-276
+// Create an Express.js route that accepts file uploads using the multer middleware and resizes and saves the uploaded image in multiple sizes 
+// (e.g., small, medium, large) to a specific directory on the server.
+
+
 
 //QB-277
+//Write a code  to implement file uploading and downloading with Express ?
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const storage2 = multer.diskStorage(
+    {
+    destination: function(req, file, cb) 
+    {
+        cb(null, 'public/uploads/'); 
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);  
+});
+const upload2 = multer({ storage: storage2 });
+app.use(express.static('public'));
+
+app.post('/upload', upload2.single('file'), (req, res) => 
+    {
+    if (!req.file) 
+    {
+        return res.status(400).send('No files were uploaded.');
+    }
+    res.send('File uploaded successfully');
+});
+
+app.get('/download/:filename', (req, res) => 
+{
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, 'public/uploads/', filename);
+
+    if (fs.existsSync(filePath)) 
+    {
+        res.sendFile(filePath);
+    } 
+    else 
+    {
+        res.status(404).send('File not found');
+    }
+});
+app.listen(4000)
+
 
 //QB-278
+//Write express js code to pass data from my Express.js application to a Pug template
+const express = require('express');
+// const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', './views');
+const data = 
+{
+    title: 'Express.js and Pug Example',
+    message: 'Hello from Express.js and Pug!',
+    items: ['Apple', 'Banana', 'Cherry']
+};
+app.get('/', (req, res) => 
+{
+    res.render('index', data);
+});
+app.listen(5000)
+
+//.pug
+// doctype html
+// html
+//     head
+//         title= title
+//     body
+//         h1= message
+//         ul
+//             each item in items
+//                 li= item
+
 
 //QB-279
+//How to implement search and filtering in a REST API with Express.js
+// your-app/
+// |-- app.js
+// |-- routes/
+// |   |-- books.js
+// |-- models/
+// |   |-- Book.js
 
-//QB-280
+// app.js
+const express = require('express');
+// const app = express();
+const bodyParser = require('body-parser');
+const booksRouter = require('./routes/books');
+
+
+app.use(bodyParser.json());
+app.use('/api/books', booksRouter);
+
+
+app.use((err, req, res, next) => 
+{
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+app.listen(3000)
+
+// model/book.js
+class Book {
+    constructor(id, title, author, genre, publishedYear) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+        this.publishedYear = publishedYear;
+    }
+}
+
+module.exports = Book;
+
+//routes/book.js
+const express = require('express');
+const router = express.Router();
+const Book = require('../models/Book');
+const books = [
+    new Book(1, 'Book 1', 'Author A', 'Fiction', 2000),
+    new Book(2, 'Book 2', 'Author B', 'Non-fiction', 2010),
+    new Book(3, 'Book 3', 'Author A', 'Fantasy', 2015),
+    new Book(4, 'Book 4', 'Author C', 'Science Fiction', 2020)
+];
+router.get('/', (req, res) => 
+{
+    let filteredBooks = [...books];
+
+    // Filter by title
+    if (req.query.title) 
+        {
+        filteredBooks = filteredBooks.filter(book =>
+            book.title.toLowerCase().includes(req.query.title.toLowerCase())
+        );
+    }
+
+    // Filter by author
+    if (req.query.author) 
+        {
+        filteredBooks = filteredBooks.filter(book =>
+            book.author.toLowerCase().includes(req.query.author.toLowerCase())
+        );
+    }
+
+    // Filter by genre
+    if (req.query.genre) 
+    {
+        filteredBooks = filteredBooks.filter(book =>
+            book.genre.toLowerCase().includes(req.query.genre.toLowerCase())
+        );
+    }
+
+    // Filter by publishedYear
+    if (req.query.publishedYear) 
+    {
+        filteredBooks = filteredBooks.filter(book =>
+            book.publishedYear === parseInt(req.query.publishedYear)
+        );
+    }
+
+    res.json(filteredBooks);
+});
+
+module.exports = router;
+
+
+
+//QB-280 
+//Write a code to set up Pug in Express.js?
+
+//.pug
+// doctype html
+// html
+//     head
+//         title= title
+//     body
+//         h1= message
+
+const express = require('express');
+// const app = express();
+const path = require('path');
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+app.get('/', (req, res) => 
+{
+    res.render('index', { title: 'Express with Pug', message: 'Hello Pug!' });
+});
+app.listen(4000)
+
+
 
 //QB-281
+//Write a code to set up nodemailer in Express.js
+const express = require('express');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const transporter = nodemailer.createTransport(
+    {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: true, // true for 465, false for other ports
+    auth: 
+    {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    }
+});
+
+app.post('/send-email', (req, res) => 
+    {
+    const { to, subject, text } = req.body;
+
+    const mailOptions = 
+    {
+        from: process.env.SMTP_USER,
+        to: to,
+        subject: subject,
+        text: text
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => 
+    {
+        if (error) 
+        {
+            console.log(error);
+            res.status(500).send('Error sending email');
+        } 
+        else 
+        {
+            console.log('Email sent: ' + info.response);
+            res.send('Email sent successfully');
+        }
+    });
+});
+app.listen(4000)
+
 
 //QB-282
 
